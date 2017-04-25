@@ -28,20 +28,22 @@
 		<div id="content">
 			<h2>Choose a Song</h2>
 				<p>Enter an artist name, song title, or contributor to a song.</p>
-					<form action="" method="post">
-						<div class="form_settings">
-							<p><span>Artist Name:</span><input class="contact" type="text" name="artist_name" value="" /></p>
+					<div class="form_settings">
+						<form action="" method="post">
+								<p><span>Artist Name:</span><input class="contact" type="text" name="artist_name" value="" /></p>
+								<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
+						</form>
+						<form action="" method="post">
 							<p><span>Song Title:</span><input class="contact" type="text" name="song_title" value="" /></p>
-							<p><span>Contributor:</span><textarea class="contact textarea" rows="8" cols="50" name="contributor"></textarea></p>
-							<p><span>Contributor:</span>
-							<select id="id" name="contributor">
-								<option value="1">Example 1</option>
-								<option value="2">Example 2</option></select></p>
-							<p style="padding-top: 15px"><input class="submit" type="submit" name="search_song" value="Submit" /></p>
-						</div>
-					</form>
-			<p><br /><br />NOTE: Only one field needs to be entered.</p>
-      </div>
+							<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
+						</form>
+						<form action="" method="post">
+							<p><span>Contributor:</span><input class="contact" type="text" name="song_title" value="" /></p>
+							<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
+						</form>
+					</div>
+			<p><br />NOTE: Only one field needs to be entered.</p>
+		</div>
     </div>
     <div id="footer">
 		<p><a href="index.php">Sign-Up</a> | <a href="singers.php">Singers</a> | <a href="portal.php">DJ Portal</a></p>
