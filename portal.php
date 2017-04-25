@@ -43,7 +43,7 @@ function confirmDelete(deleteUrl, name) {
 	}
 	    
     // print queue list using table
-    function print_queue_list( $rows, $free_queue )
+    function print_queue_list( $rows, $free_queue, $sort_kind, $dj_id )
     {
 
 		if( count( $rows ) == 0 )
@@ -62,6 +62,7 @@ function confirmDelete(deleteUrl, name) {
 				{
 				    if( $key == "singer_name" || 
 				    	$key == "song_title" ||
+				    	$key == "artist_name" ||
 				    	$key == "version" )
 				    {
 						echo "<th align='left'>";
@@ -73,7 +74,7 @@ function confirmDelete(deleteUrl, name) {
 				    {
 						echo "<th align='left'>";
 						if( !$free_queue )
-							echo "<a href=\"javascript:window.location = 'portal.php?sort_kind=" . $key . "';\">";
+							echo "<a href=\"javascript:window.location = 'portal.php?dj_id=$dj_id&sort_kind=" . $key . "';\">";
 						echo $key;
 						if( !$free_queue )
 							echo "</a>";
@@ -111,12 +112,18 @@ function confirmDelete(deleteUrl, name) {
 				    {
 						echo "<td>";
 						echo "<a href=\"javascript:confirmDelete('portal.php?singer_id=$singer_id&" 
-							. "file_id=$file_id&date_added=$date_added', '$colvalue');\">";
+							. "file_id=$file_id&date_added=$date_added&sort_kind=$sort_kind&dj_id=$dj_id', '$colvalue');\">";
 						echo $colvalue;
 						echo "</a>";
 						echo "&nbsp;&nbsp;" . "</td>\n";
 					}
 					else if( $colname == "song_title" )
+					{
+						echo "<td>";
+						echo $colvalue . "&nbsp;&nbsp;";
+						echo "</td>\n";
+					}
+					else if( $colname == "artist_name" )
 					{
 						echo "<td>";
 						echo $colvalue . "&nbsp;&nbsp;";
@@ -157,115 +164,138 @@ function confirmDelete(deleteUrl, name) {
 	if( array_key_exists( "sort_kind", $_GET ) )
 		$sort_kind = $_GET["sort_kind"];
 		
-    try
-    {
-        $pdo = new PDO( $dsn, $username, $password );
-        
-        // delete selected record in the queue
-		if( $singer_id > 0 )
-		{
+	$dj_id = 0;
+	if( array_key_exists( "dj_id", $_GET ) )
+		$dj_id = $_GET["dj_id"];
 		
-				// check if the record you want to update exists
-				$sql = "SELECT * FROM enqueue "
-					. "WHERE singer_id = :singer_id AND "
-					. "file_id = :file_id AND date_added = :date_added;";
-				$stat  = $pdo->prepare( $sql );
-				//echo "type: " . gettype( $stat ) . "</br>";
-				$succeeded = $stat->execute( array( ":singer_id" => $singer_id ,
-					":file_id" => $file_id, ":date_added" => $date_added ) );
+		
+	if( $dj_id != "466" )
+	{
+		// accelerated queue
+		echo "<b><font color='black'>Verify DJ</font></b><br />\n";
+?>
+			<div class="form_settings">
+				<p><span>DJ ID:</span><input class="contact" type="text" name="dj_id" value="" /></p>
+				<p style="padding-top: 15px"><input class="submit" type="button" name="verify" 
+				value="Verify" onclick="javascript:document.forms['form1'].submit();" /></p>
+			</div>
+<?php
 
-        		/*
-				if( $succeeded )
-					echo "prepare(): Succeeded!</br>" . $sql;
-				else
-					echo "prepare(): Failed!</br>"; 
-				*/
-
-				$rows = $stat->fetchAll(PDO::FETCH_ASSOC);
-			
-			    // if the flight does not exists, alert
-				if( count( $rows ) == 0 )
-				{				
-					echo "The record you chose does not exist</br>";
-				}
-				
-				// if the flight exits, delete the flight in the DB 
-				else
-				{
-					/*
-					// delete the record of the record on the enqueue
-					$sql = "DELETE FROM enqueue "
-					. "WHERE singer_id = :singer_id AND "
-					. "file_id = :file_id AND date_added = :date_added;";
-					*/
-					// update the record of the passengers on the flight
-					$sql = "UPDATE enqueue SET flag = TRUE "
-					. "WHERE singer_id = :singer_id AND "
-					. "file_id = :file_id AND date_added = :date_added;";
-										
+	}
+	else
+	{
+		try
+		{
+			$pdo = new PDO( $dsn, $username, $password );
+		
+			// delete selected record in the queue
+			if( $singer_id > 0 )
+			{
+		
+					// check if the record you want to update exists
+					$sql = "SELECT * FROM enqueue "
+						. "WHERE singer_id = :singer_id AND "
+						. "file_id = :file_id AND date_added = :date_added;";
 					$stat  = $pdo->prepare( $sql );
 					//echo "type: " . gettype( $stat ) . "</br>";
 					$succeeded = $stat->execute( array( ":singer_id" => $singer_id ,
 						":file_id" => $file_id, ":date_added" => $date_added ) );
 
+					/*
 					if( $succeeded )
-					{
-						//alert( "Succeeded");
+						echo "prepare(): Succeeded!</br>" . $sql;
+					else
+						echo "prepare(): Failed!</br>"; 
+					*/
+
+					$rows = $stat->fetchAll(PDO::FETCH_ASSOC);
+			
+					// if the flight does not exists, alert
+					if( count( $rows ) == 0 )
+					{				
+						echo "The record you chose does not exist</br>";
 					}
+				
+					// if the flight exits, delete the flight in the DB 
 					else
 					{
-						alert( "Failed");
+						/*
+						// delete the record of the record on the enqueue
+						$sql = "DELETE FROM enqueue "
+						. "WHERE singer_id = :singer_id AND "
+						. "file_id = :file_id AND date_added = :date_added;";
+						*/
+						// update the record of the passengers on the flight
+						$sql = "UPDATE enqueue SET flag = TRUE "
+						. "WHERE singer_id = :singer_id AND "
+						. "file_id = :file_id AND date_added = :date_added;";
+										
+						$stat  = $pdo->prepare( $sql );
+						//echo "type: " . gettype( $stat ) . "</br>";
+						$succeeded = $stat->execute( array( ":singer_id" => $singer_id ,
+							":file_id" => $file_id, ":date_added" => $date_added ) );
+
+						if( $succeeded )
+						{
+							//alert( "Succeeded");
+						}
+						else
+						{
+							alert( "Failed");
+						}
 					}
-				}
-		}
+			}
 
-        
-		// accelerated queue
-		echo "<b><font color='black'>Accelerated Queue:</font></b><br />\n";
-        
-		$sql = "SELECT si.singer_id, ka.file_id, q.date_added as date_temp,
-			si.singer_name, so.song_title, ka.version, q.amount_paid,
-			q.date_added
-			FROM enqueue q, karaoke_file ka, singer si, song so
-			WHERE q.singer_id = si.singer_id AND q.file_id = ka.file_id 
-			AND ka.song_id = so.song_id AND q.flag = FALSE AND q.amount_paid > 0 "
-			. ($sort_kind=="date_added"?"ORDER BY q.date_added DESC;":"ORDER BY q.amount_paid DESC;");
-        $stat = $pdo->query( $sql );		// return PDOStatement object       	
+		
+			// accelerated queue
+			echo "<b><font color='black'>Accelerated Queue:</font></b><br />\n";
+		
+			$sql = "SELECT si.singer_id, ka.file_id, q.date_added as date_temp,
+				si.singer_name, so.song_title, so.artist_name, ka.version, q.amount_paid,
+				q.date_added
+				FROM enqueue q, karaoke_file ka, singer si, song so
+				WHERE q.singer_id = si.singer_id AND q.file_id = ka.file_id 
+				AND ka.song_id = so.song_id AND q.flag = FALSE AND q.amount_paid > 0 "
+				. ($sort_kind=="date_added"?"ORDER BY q.date_added DESC;":"ORDER BY q.amount_paid DESC;");
+			$stat = $pdo->query( $sql );		// return PDOStatement object       	
 	
-        $rows = $stat->fetchAll(PDO::FETCH_ASSOC);
-        
-        //print_r( $rows );
-        print_queue_list( $rows, false );
-        
-		// free queue
-		echo "<b><font color='black'>Free Queue:</font></b><br />\n";
-        
-		$sql = "SELECT si.singer_id, ka.file_id, q.date_added as date_temp,
-			si.singer_name, so.song_title, ka.version,
-			q.date_added			
-			FROM enqueue q, karaoke_file ka, singer si, song so
-			WHERE q.singer_id = si.singer_id AND q.file_id = ka.file_id 
-			AND ka.song_id = so.song_id AND q.flag = FALSE AND q.amount_paid = 0
-			ORDER BY q.date_added DESC;";
-        $stat = $pdo->query( $sql );		// return PDOStatement object       
-        
-        $rows = $stat->fetchAll(PDO::FETCH_ASSOC);
-        
-        //print_r( $rows );
-        print_queue_list( $rows, true );
-        
+			$rows = $stat->fetchAll(PDO::FETCH_ASSOC);
+		
+			//print_r( $rows );
+			print_queue_list( $rows, false, $sort_kind, $dj_id );
+		
+			// free queue
+			echo "<b><font color='black'>Free Queue:</font></b><br />\n";
+		
+			$sql = "SELECT si.singer_id, ka.file_id, q.date_added as date_temp,
+				si.singer_name, so.song_title, so.artist_name, ka.version,
+				q.date_added			
+				FROM enqueue q, karaoke_file ka, singer si, song so
+				WHERE q.singer_id = si.singer_id AND q.file_id = ka.file_id 
+				AND ka.song_id = so.song_id AND q.flag = FALSE AND q.amount_paid = 0
+				ORDER BY q.date_added DESC;";
+			$stat = $pdo->query( $sql );		// return PDOStatement object       
+		
+			$rows = $stat->fetchAll(PDO::FETCH_ASSOC);
+		
+			//print_r( $rows );
+			print_queue_list( $rows, true, $sort_kind, $dj_id );
+		
 
-    }
-    catch( PDOexecption $e )
-    {
-        echo "DB connection Failed: " . $e->getMessage();
-    }
-    
-?>
+		}
+		catch( PDOexecption $e )
+		{
+			echo "DB connection Failed: " . $e->getMessage();
+		}
+		
+		echo <<<_REFRESH
 			<div class="form_settings">
 				<p><input class="submit" type="button" name="refresh" value="Refresh" 
-							onclick="javascript:window.location.reload(false);"/></p>
+							onclick="javascript:window.location = 'portal.php?dj_id=$dj_id&sort_kind=$sort_kind';"/></p>
 			</div>
+_REFRESH;
+    }
+?>
 </form>
 		</div>
 	</div>
