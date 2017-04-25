@@ -26,20 +26,83 @@
 		</div>
 	<div id="site_content">
 		<div id="content">
+			<div class="right">
+				<?php
+				if(isset($_POST['search_name']))
+				{
+					$artistName = $_POST['artist_name'];
+
+					$sql2 = "SELECT singer_name FROM singer WHERE singer_name LIKE '%" . $artistName ."%'";
+					$query2 = $pdo->query($sql2);
+					
+					while ($rows = $query2->fetch())
+					{
+						echo "<br />" . $rows['0'] . " Was found! <br />";
+					}
+
+					if($query2->rowCount() < 1)
+					{
+						echo '<div class="p2">' . "Singer not found!" . "</div>";
+					}
+				}
+				?>
+			</div>
+			<div class="right">
+				<?php
+				if(isset($_POST['search_song']))
+				{
+					$songTitle = $_POST['song_title'];
+
+					$sql2 = "SELECT song_title FROM song WHERE song_title LIKE '%" . $songTitle ."%'";
+					$query2 = $pdo->query($sql2);
+					
+					while ($rows = $query2->fetch())
+					{
+						echo "<br />" . $rows['0'] . " Was found! <br />";
+					}
+
+					if($query2->rowCount() < 1)
+					{
+						echo '<div class="p2">' . "Song not found!" . "</div>";
+					}
+				}
+				?>
+			</div>
+			<div class="right">
+				<?php
+				if(isset($_POST['search_cont']))
+				{
+					$contributor = $_POST['contribution'];
+
+					$sql2 = "SELECT contributor_name FROM contributor WHERE contributor_name LIKE '%" . $contributor ."%'";
+					$query2 = $pdo->query($sql2);
+					
+					while ($rows = $query2->fetch())
+					{
+						echo "<br />" . $rows['0'] . " Was found! <br />";
+					}
+
+					if($query2->rowCount() < 1)
+					{
+						echo '<div class="p2">' . "Singer not found!" . "</div>";
+					}
+				}
+				?>
+			</div>
 			<h2>Choose a Song</h2>
 				<p>Enter an artist name, song title, or contributor to a song.</p>
 					<div class="form_settings">
-						<form action="" method="post">
+						<form action="singers.php" method="post" name="singer_name">
 								<p><span>Artist Name:</span><input class="contact" type="text" name="artist_name" value="" /></p>
-								<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
+								<p><input class="submit" type="submit" name="search_name" value="Submit" /></p>
 						</form>
-						<form action="" method="post">
+						<form action="singers.php" method="post" name="song_title">
 							<p><span>Song Title:</span><input class="contact" type="text" name="song_title" value="" /></p>
 							<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
 						</form>
-						<form action="" method="post">
-							<p><span>Contributor:</span><input class="contact" type="text" name="song_title" value="" /></p>
-							<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
+						<form action="singers.php" method="post" name="contributor">
+							<p><span>Contributor:</span><input class="contact" type="text" name="contribution" value="" /></p>
+							<p><input class="submit" type="submit" name="search_cont" value="Submit" /></p>
 						</form>
 					</div>
 			<p><br />NOTE: Only one field needs to be entered.</p>

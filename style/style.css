@@ -76,7 +76,9 @@ ol li
 .right
 { float: right; 
   width: auto;
-  margin-left: 10px;}
+  margin-left: 10px;
+  margin-top: 50px;
+  position: relative;}
 
 .center
 { display: block;
@@ -202,7 +204,7 @@ ul#menu li a:hover
   text-decoration: none;}
 
 .form_settings
-{ margin: 15px 0 0 0;}
+{ margin: 10px 0 0 0;}
 
 .form_settings p
 { padding: 0 0 4px 0;}
