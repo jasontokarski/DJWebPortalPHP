@@ -164,7 +164,7 @@
 			if($singerFound == 1)
 			{
 				echo '<h2>' . $searchResult[0][1] . ' was found! </h2>';
-				echo '<p>ID = ' . $file_id[0] . '</p>';
+				echo '<p>Add this song to the free queue or accelerated queue with a payment amount.</p>';
 				echo '
 					<div class="form_settings">
 						<form action="singers.php" method="post" name="free_queue">
