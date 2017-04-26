@@ -129,7 +129,7 @@
 				{
 						date_default_timezone_set('America/Chicago');
 						$date = date('Y-m-d H:i:s', time());
-						$sql2 = "INSERT INTO enqueue VALUES ('". $_POST['singer_id'] . "', '" .  $_POST['file_id'] . "', '" . $date . "', '" . 0 . "', '" . 1 . "');";
+						$sql2 = "INSERT INTO enqueue VALUES ('". $_POST['singer_id'] . "', '" .  $_POST['file_id'] . "', '" . $date . "', '" . 0 . "', '" . 0 . "');";
 
 						$query2 = $pdo->query($sql2);
 						if($query2)
@@ -146,7 +146,7 @@
 				{
 						date_default_timezone_set('America/Chicago');
 						$date = date('Y-m-d H:i:s', time());
-						$sql2 = "INSERT INTO enqueue VALUES ('". $_POST['singer_id'] . "', '" .  $_POST['file_id'] . "', '" . $date . "', '" . $_POST['acc_amount'] . "', '" . 1 . "');";
+						$sql2 = "INSERT INTO enqueue VALUES ('". $_POST['singer_id'] . "', '" .  $_POST['file_id'] . "', '" . $date . "', '" . $_POST['acc_amount'] . "', '" . 0 . "');";
 
 						$query2 = $pdo->query($sql2);
 						if($query2)
