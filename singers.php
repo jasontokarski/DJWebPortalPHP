@@ -15,9 +15,7 @@
 	$singer_id = 0;
 	if( array_key_exists( "singer_id", $_POST ) )
 	{
-		session_start();
 		$singer_id = $_POST["singer_id"];
-		$_SESSION['singer_id'] = $_POST['singer_id'];
 	}
 ?>
 
@@ -41,90 +39,125 @@
 	<div id="site_content">
 		<div id="content">
 				<?php
-				if(isset($_POST['search_name']))
-				{
-					$artistName = $_POST['artist_name'];
+					if(isset($_POST['search_name']))
+					{
+						$artistName = $_POST['artist_name'];
 
-					$sql2 = "SELECT song_id, artist_name FROM song WHERE artist_name LIKE '%" . $artistName ."%'";
-					$query2 = $pdo->query($sql2);
-					
-					if($query2->rowCount() > 0)
-					{
-						array_push($searchResult, $query2->fetch());
-						array_push($searchResult, $query2->fetch());
-						$singerFound = 1;
+						$sql2 = "SELECT song_id, artist_name FROM song WHERE artist_name LIKE '%" . $artistName ."%'";
+						$query2 = $pdo->query($sql2);
+						
+						if($query2->rowCount() > 0)
+						{
+							array_push($searchResult, $query2->fetch());
+							array_push($searchResult, $query2->fetch());
+							$singerFound = 1;
+						}
+						else
+						{
+							$notFound = 1;
+						}
+						
+						$sql2 = "SELECT file_id FROM karaoke_file WHERE song_id = '" . $searchResult[0][0] . "';";
+						$query2 = $pdo->query($sql2);
+						if($query2->rowCount() > 0)
+						{
+							$file_id = $query2->fetch();
+						}
 					}
-					else
-					{
-						$notFound = 1;
-					}
-					
-					$sql2 = "SELECT file_id FROM karaoke_file WHERE song_id = '" . $searchResult[0][0] . "';";
-					$query2 = $pdo->query($sql2);
-					if($query2->rowCount() > 0)
-					{
-						$file_id = $query2->fetch();
-					}
-				}
 				?>
 			
 				<?php
-				if(isset($_POST['search_song']))
-				{
-					$songTitle = $_POST['song_title'];
-
-					$sql2 = "SELECT song_title FROM song WHERE song_title LIKE '%" . $songTitle ."%'";
-					$query2 = $pdo->query($sql2);
-
-					if($query2->rowCount() > 0)
+					if(isset($_POST['search_song']))
 					{
-						$searchResult = $query2->fetch();
-						$singerFound = 1;
+						$songTitle = $_POST['song_title'];
+
+						$sql2 = "SELECT song_id, song_title FROM song WHERE song_title LIKE '%" . $songTitle ."%'";
+						$query2 = $pdo->query($sql2);
+
+						if($query2->rowCount() > 0)
+						{
+							array_push($searchResult, $query2->fetch());
+							array_push($searchResult, $query2->fetch());
+							$singerFound = 1;
+						}
+						else
+						{
+							$notFound = 1;
+						}
+						
+						$sql2 = "SELECT file_id FROM karaoke_file WHERE song_id = '" . $searchResult[0][0] . "';";
+						$query2 = $pdo->query($sql2);
+						if($query2->rowCount() > 0)
+						{
+							$file_id = $query2->fetch();
+						}
 					}
-					else
-					{
-						$notFound = 1;
-					}
-				}
 				?>
 			
 				<?php
-				if(isset($_POST['search_cont']))
-				{
-					$contributor = $_POST['contribution'];
+					if(isset($_POST['search_cont']))
+					{
+						$contributor = $_POST['contribution'];
 
-					$sql2 = "SELECT contributor_name FROM contributor WHERE contributor_name LIKE '%" . $contributor ."%'";
-					$query2 = $pdo->query($sql2);
-					
-					if($query2->rowCount() > 0)
-					{
-						$searchResult = $query2->fetch();
-						$singerFound = 1;
+						$sql2 = "SELECT contributor_id, contributor_name FROM contributor WHERE contributor_name LIKE '%" . $contributor ."%'";
+						$query2 = $pdo->query($sql2);
+						
+						if($query2->rowCount() > 0)
+						{
+							array_push($searchResult, $query2->fetch());
+							array_push($searchResult, $query2->fetch());
+							$singerFound = 1;
+						}
+						else
+						{
+							$notFound = 1;
+						}
+						
+						$sql2 = "SELECT file_id FROM karaoke_file WHERE song_id IN
+										(SELECT song_id FROM contributes WHERE contributor_id IN
+											(SELECT contributor_id FROM contributor WHERE contributor_id= '" . $searchResult[0][0] . "'));";
+						$query2 = $pdo->query($sql2);
+						if($query2->rowCount() > 0)
+						{
+							$file_id = $query2->fetch();
+						}
 					}
-					else
-					{
-						$notFound = 1;
-					}
-				}
 				?>
 				
 			<?php
-			if(isset($_POST['add_free']))
-			{
-					date_default_timezone_set('America/Chicago');
-					$date = date('m/d/Y h:i:s a', time());
-					$sql2 = "INSERT INTO enqueue VALUES ('". $_POST['singer_id'] . "', '" .  $_POST['file_id'] . "', '" . $date . "', '" . 0 . "', '" . 1 . "');";
-					//INSERT INTO enqueue VALUES ('1', '1', '1',  '0', '0');
-					$query2 = $pdo->query($sql2);
-					if($query2)
-					{
-						echo "Inserted Succesfully!";
-					}
-					else
-					{
-						echo "Error on insertion!";
-					}
-			}
+				if(isset($_POST['add_free']))
+				{
+						date_default_timezone_set('America/Chicago');
+						$date = date('Y-m-d H:i:s', time());
+						$sql2 = "INSERT INTO enqueue VALUES ('". $_POST['singer_id'] . "', '" .  $_POST['file_id'] . "', '" . $date . "', '" . 0 . "', '" . 1 . "');";
+
+						$query2 = $pdo->query($sql2);
+						if($query2)
+						{
+							echo "Inserted Succesfully!";
+						}
+						else
+						{
+							echo "Error on insertion!";
+						}
+				}
+			
+				if(isset($_POST['add_acc']))
+				{
+						date_default_timezone_set('America/Chicago');
+						$date = date('Y-m-d H:i:s', time());
+						$sql2 = "INSERT INTO enqueue VALUES ('". $_POST['singer_id'] . "', '" .  $_POST['file_id'] . "', '" . $date . "', '" . $_POST['acc_amount'] . "', '" . 1 . "');";
+
+						$query2 = $pdo->query($sql2);
+						if($query2)
+						{
+							echo "Inserted Succesfully!";
+						}
+						else
+						{
+							echo "Error on insertion!";
+						}
+				}
 			?>
 			
 			<?php
@@ -156,28 +189,28 @@
 				{
 						echo '<div class="right"><h2><br /><br /><br /><br />' . "No results found!" . '</h2></div>';
 				}
-			echo '
-			<h2>Choose a Song</h2>
-				<p>Enter an artist name, song title, or contributor to a song.</p>
-					<div class="form_settings">
-						<form action="singers.php" method="post" name="singer_name">
-							<p><span>Artist Name:</span><input class="contact" type="text" name="artist_name" value="" /></p>
-							<input type="hidden" name="singer_id" value="' . $singer_id . '" />
-							<p><input class="submit" type="submit" name="search_name" value="Submit" /></p>
-						</form>
-						<form action="singers.php" method="post" name="song_title">
-							<p><span>Song Title:</span><input class="contact" type="text" name="song_title" value="" /></p>
-							<input type="hidden" name="singer_id" value="' . $singer_id . '" />
-							<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
-						</form>
-						<form action="singers.php" method="post" name="contributor">
-							<p><span>Contributor:</span><input class="contact" type="text" name="contribution" value="" /></p>
-							<input type="hidden" name="singer_id" value="' . $singer_id . '" />
-							<p><input class="submit" type="submit" name="search_cont" value="Submit" /></p>
-						</form>
-					</div>
-			<p><br />NOTE: Only one field needs to be entered.</p>
-			';
+				echo '
+				<h2>Choose a Song</h2>
+					<p>Enter an artist name, song title, or contributor to a song.</p>
+						<div class="form_settings">
+							<form action="singers.php" method="post" name="singer_name">
+								<p><span>Artist Name:</span><input class="contact" type="text" name="artist_name" value="" /></p>
+								<input type="hidden" name="singer_id" value="' . $singer_id . '" />
+								<p><input class="submit" type="submit" name="search_name" value="Submit" /></p>
+							</form>
+							<form action="singers.php" method="post" name="song_title">
+								<p><span>Song Title:</span><input class="contact" type="text" name="song_title" value="" /></p>
+								<input type="hidden" name="singer_id" value="' . $singer_id . '" />
+								<p><input class="submit" type="submit" name="search_song" value="Submit" /></p>
+							</form>
+							<form action="singers.php" method="post" name="contributor">
+								<p><span>Contributor:</span><input class="contact" type="text" name="contribution" value="" /></p>
+								<input type="hidden" name="singer_id" value="' . $singer_id . '" />
+								<p><input class="submit" type="submit" name="search_cont" value="Submit" /></p>
+							</form>
+						</div>
+				<p><br />NOTE: Only one field needs to be entered.</p>
+				';
 			}
 			?>
 		</div>
